@@ -1,5 +1,6 @@
 package hackeru.edu.savingdata;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements TextWatcher {
     private EditText etNote;
@@ -29,12 +31,25 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         etNote = (EditText) findViewById(R.id.etNote);
         etNote.addTextChangedListener(this);
         setSupportActionBar(toolbar);
+        prefs = getSharedPreferences("Notes", MODE_PRIVATE);
 
+        String userName = prefs.getString("UserName", null);
+
+        if (userName == null){
+            //Not Logged in yet.
+            startActivity(new Intent(this, LoginActivity.class));
+        }else {
+            //We already have a user:
+            Toast.makeText(this, "Hi, " + userName, Toast.LENGTH_SHORT).show();
+        }
         //if we have a userName in the prefs->
         //say Hi, +"User Name"
         //else-> send the user to the login Activity.
+        /*
+        * Intent intent = new Intent(this , LoginActivity.class);
+        * startActivity(intent);
+        * */
 
-        prefs = getSharedPreferences("Notes", MODE_PRIVATE);
         loadNote();
     }
 
@@ -67,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         * </item>
         *
         * <item name = "note2">
+        *   Hi, mom. I Quit my Job Don't call me -> I'll call you.
+        * </item>
+        *
+        * <item name = "UserName">
         *   Hi, mom. I Quit my Job Don't call me -> I'll call you.
         * </item>
         *
