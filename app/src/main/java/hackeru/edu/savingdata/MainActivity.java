@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher {
+public class MainActivity extends AppCompatActivity implements TextWatcher, View.OnClickListener {
     private EditText etNote;
     private FloatingActionButton fab;
     private Toolbar toolbar;
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         etNote = (EditText) findViewById(R.id.etNote);
         etNote.addTextChangedListener(this);
+        fab.setOnClickListener(this);
+
         setSupportActionBar(toolbar);
         prefs = getSharedPreferences("Notes", MODE_PRIVATE);
 
@@ -124,4 +126,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         return super.onOptionsItemSelected(item);
     }
 
+
+    int noteCounter = 1;
+    int currentNote = 1;
+    @Override
+    public void onClick(View v) {
+
+    }
 }
