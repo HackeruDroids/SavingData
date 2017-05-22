@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
     private Toolbar toolbar;
     private SharedPreferences prefs;
 
+    private int noteCounter = 1;
+    private int currentNote = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,10 +40,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         String userName = prefs.getString("UserName", null);
 
-        if (userName == null){
+        if (userName == null) {
             //Not Logged in yet.
             startActivity(new Intent(this, LoginActivity.class));
-        }else {
+        } else {
             //We already have a user:
             Toast.makeText(this, "Hi, " + userName, Toast.LENGTH_SHORT).show();
         }
@@ -51,19 +54,29 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         * Intent intent = new Intent(this , LoginActivity.class);
         * startActivity(intent);
         * */
-
+        loadNoteCounter();
         loadNote();
     }
 
-    private void loadNote() {
-        String note = prefs.getString("note1", ""/*if no data yet, give me an Empty String*/);
-        etNote.setText(note);
+    private void loadNoteCounter() {
+        currentNote = prefs.getInt("CurrentNote", 1);
+        noteCounter = prefs.getInt("NoteCounter", 1);
     }
+
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         saveNote();
     }
+
+
+
+
+    private void loadNote() {
+        String note = prefs.getString("note" + currentNote, ""/*if no data yet, give me an Empty String*/);
+        etNote.setText(note);
+    }
+
 
     private void saveNote() {
         //xml Notes.xml
@@ -72,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
 
         //2) use the prefs Editor to write some data in key value pairs
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("note1", etNote.getText().toString());
+        editor.putString("note" + currentNote, etNote.getText().toString());
 
         //3) commit the changes / Or apply them
         //editor.commit(); //immediately save the changes. Blocking code.
@@ -117,20 +130,55 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, View
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_back:
+                previousNote();
+                return true;
+            case R.id.action_next:
+                nextNote();
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-
-    int noteCounter = 1;
-    int currentNote = 1;
+    /**
+     * New Note Clicked
+     */
     @Override
     public void onClick(View v) {
-
+        noteCounter++;
+        currentNote = noteCounter;
+        etNote.setText("");
+        saveNoteCounter();
     }
+
+    private void saveNoteCounter() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("NoteCounter", noteCounter);
+        editor.putInt("CurrentNote", currentNote);
+        editor.commit();
+    }
+
+    private void previousNote() {
+        currentNote--;
+        if (currentNote < 1) {
+            currentNote = 1;
+            Toast.makeText(this, "The First Note", Toast.LENGTH_SHORT).show();
+        }
+        loadNote();
+        saveNoteCounter();
+    }
+
+    private void nextNote() {
+        currentNote++;
+        if (currentNote > noteCounter){
+            currentNote = noteCounter;
+            Toast.makeText(this, "Last Note", Toast.LENGTH_SHORT).show();
+        }
+        loadNote();
+        saveNoteCounter();
+    }
+
 }
